@@ -6,6 +6,5 @@ issues: []
 deprecation:
   title: "[Inference API] Deprecate elser service"
   area: Machine Learning
-  details: Please describe the details of this change for the release notes. You can
-    use asciidoc.
-  impact: Please describe the impact of this change to users
+  details: The `elser` service of the inference API will be removed in an upcoming release. Please use the elasticsearch service instead. 
+  impact: In the current version there is no impact. In a future version, users of the `elser` service will no longer be able to use it, and will be required to use the `elasticsearch` service to access elser through the inference API.
