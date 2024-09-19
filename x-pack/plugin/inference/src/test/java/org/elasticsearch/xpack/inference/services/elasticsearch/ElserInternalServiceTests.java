@@ -34,7 +34,6 @@ import org.elasticsearch.xpack.core.ml.inference.trainedmodel.TokenizationConfig
 import org.elasticsearch.xpack.inference.services.elser.ElserInternalModel;
 import org.elasticsearch.xpack.inference.services.elser.ElserInternalService;
 import org.elasticsearch.xpack.inference.services.elser.ElserInternalServiceSettings;
-import org.elasticsearch.xpack.inference.services.elser.ElserMlNodeTaskSettings;
 import org.elasticsearch.xpack.inference.services.elser.ElserModels;
 import org.junit.After;
 import org.junit.Before;
