@@ -28,7 +28,6 @@ import org.elasticsearch.xcontent.XContentBuilder;
 import org.elasticsearch.xpack.inference.InferencePlugin;
 import org.elasticsearch.xpack.inference.registry.ModelRegistry;
 import org.elasticsearch.xpack.inference.services.elasticsearch.ElserInternalServiceSettingsTests;
-import org.elasticsearch.xpack.inference.services.elasticsearch.ElserInternalServiceTests;
 import org.elasticsearch.xpack.inference.services.elser.ElserInternalModel;
 import org.elasticsearch.xpack.inference.services.elser.ElserInternalService;
 import org.junit.Before;
