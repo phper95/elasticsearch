@@ -29,6 +29,8 @@ import org.elasticsearch.xpack.inference.registry.ModelRegistry;
 import org.elasticsearch.xpack.inference.services.elasticsearch.ElasticsearchInternalService;
 import org.elasticsearch.xpack.inference.telemetry.InferenceStats;
 
+import static org.elasticsearch.xpack.inference.services.elasticsearch.ElasticsearchInternalService.OLD_ELSER_SERVICE_NAME;
+
 public class TransportInferenceAction extends HandledTransportAction<InferenceAction.Request, InferenceAction.Response> {
     private static final String STREAMING_INFERENCE_TASK_TYPE = "streaming_inference";
     private static final String STREAMING_TASK_ACTION = "xpack/inference/streaming_inference[n]";
@@ -71,13 +73,12 @@ public class TransportInferenceAction extends HandledTransportAction<InferenceAc
                 );
                 return;
             }
-            String ELSER_SERVICE_NAME = "elser";
-            if (service.get().name().equals(ELSER_SERVICE_NAME)) {
+            if (service.get().name().equals(OLD_ELSER_SERVICE_NAME)) {
                 DEPRECATION_LOGGER.warn(
                     DeprecationCategory.API,
                     "inference_api_elser_service",
                     "The [{}] service is deprecated and will be removed in a future release. Use the [{}] service instead.",
-                    ELSER_SERVICE_NAME,
+                    OLD_ELSER_SERVICE_NAME,
                     ElasticsearchInternalService.NAME
                 );
             }
