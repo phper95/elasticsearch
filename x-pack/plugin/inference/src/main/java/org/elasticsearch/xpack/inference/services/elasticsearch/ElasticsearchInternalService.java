@@ -336,6 +336,14 @@ public class ElasticsearchInternalService extends BaseElasticsearchInternalServi
                 NAME,
                 new MultilingualE5SmallInternalServiceSettings(ElasticsearchInternalServiceSettings.fromPersistedMap(serviceSettingsMap))
             );
+        } else if (ElserModels.isValidModel(modelId)) {
+            return new ElserInternalModel(
+                inferenceEntityId,
+                taskType,
+                NAME,
+                new ElserInternalServiceSettings(ElasticsearchInternalServiceSettings.fromPersistedMap(serviceSettingsMap)),
+                ElserMlNodeTaskSettings.DEFAULT
+            );
         } else {
             return createCustomElandModel(
                 inferenceEntityId,
