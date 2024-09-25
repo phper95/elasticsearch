@@ -38,6 +38,7 @@ import org.elasticsearch.xpack.inference.results.SparseEmbeddingResultsTests;
 import org.elasticsearch.xpack.inference.services.ServiceFields;
 import org.elasticsearch.xpack.inference.services.elasticsearch.ElserModels;
 import org.elasticsearch.xpack.inference.services.openai.OpenAiService;
+
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -311,7 +312,13 @@ public class ElasticInferenceServiceTests extends ESTestCase {
     public void testCheckModelConfig_ReturnsNewModelReference() throws IOException {
         var senderFactory = HttpRequestSenderTests.createSenderFactory(threadPool, clientManager);
 
-        try (var service = new OpenAiService(senderFactory, createWithEmptySettings(threadPool))) {
+        try (
+            var service = new ElasticInferenceService(
+                senderFactory,
+                createWithEmptySettings(threadPool),
+                new ElasticInferenceServiceComponents(getUrl(webServer))
+            )
+        ) {
             var model = ElasticInferenceServiceSparseEmbeddingsModelTests.createModel(getUrl(webServer));
             PlainActionFuture<Model> listener = new PlainActionFuture<>();
             service.checkModelConfig(model, listener);
