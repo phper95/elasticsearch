@@ -1,99 +1,12 @@
-[[sparse-vector]]
-=== Sparse vector field type
-
-++++
-<titleabbrev>Sparse vector</titleabbrev>
-++++
-
-A `sparse_vector` field can index features and weights so that they can later be used to query documents in queries with a <<query-dsl-sparse-vector-query, `sparse_vector`>>.
-This field can also be used with a legacy <<query-dsl-text-expansion-query,`text_expansion`>> query.
-
-`sparse_vector` is the field type that should be used with <<elser-mappings, ELSER mappings>>.
-
-[source,console]
---------------------------------------------------
-PUT my-index
-{
-  "mappings": {
-    "properties": {
-      "text.tokens": {
-        "type": "sparse_vector"
-      }
-    }
-  }
-}
---------------------------------------------------
-
-See <<semantic-search-elser, semantic search with ELSER>> for a complete example on adding documents to a `sparse_vector` mapped field using ELSER.
-
-[[index-multi-value-sparse-vectors]]
-==== Multi-value sparse vectors
-
-When passing in arrays of values for sparse vectors the max value for similarly named features is selected.
-
-The paper Adapting Learned Sparse Retrieval for Long Documents (https://arxiv.org/pdf/2305.18494.pdf) discusses this in more detail.
-In summary, research findings support representation aggregation typically outperforming score aggregation.
-
-For instances where you want to have overlapping feature names use should store them separately or use nested fields.
-
-Below is an example of passing in a document with overlapping feature names.
-Consider that in this example two categories exist for positive sentiment and negative sentiment.
-However, for the purposes of retrieval we also want the overall impact rather than specific sentiment.
-In the example `impact` is stored as a multi-value sparse vector and only the max values of overlapping names are stored.
-More specifically the final `GET` query here returns a `_score` of ~1.2 (which is the `max(impact.delicious[0], impact.delicious[1])` and is approximate because we have a relative error of 0.4% as explained below)
-
-[source,console]
---------------------------------
-PUT my-index-000001
-{
-  "mappings": {
-    "properties": {
-      "text": {
-        "type": "text",
-        "analyzer": "standard"
-      },
-      "impact": {
-        "type": "sparse_vector"
-      },
-      "positive": {
-        "type": "sparse_vector"
-      },
-      "negative": {
-        "type": "sparse_vector"
-      }
-    }
-  }
-}
-
-POST my-index-000001/_doc
-{
-    "text": "I had some terribly delicious carrots.",
-    "impact": [{"I": 0.55, "had": 0.4, "some": 0.28, "terribly": 0.01, "delicious": 1.2, "carrots": 0.8},
-               {"I": 0.54, "had": 0.4, "some": 0.28, "terribly": 2.01, "delicious": 0.02, "carrots": 0.4}],
-    "positive": {"I": 0.55, "had": 0.4, "some": 0.28, "terribly": 0.01, "delicious": 1.2, "carrots": 0.8},
-    "negative": {"I": 0.54, "had": 0.4, "some": 0.28, "terribly": 2.01, "delicious": 0.02, "carrots": 0.4}
-}
-
-GET my-index-000001/_search
-{
-  "query": {
-    "term": {
-      "impact": {
-         "value": "delicious"
-      }
-    }
-  }
-}
---------------------------------
-
-NOTE: `sparse_vector` fields can not be included in indices that were *created* on {es} versions between 8.0 and 8.10
-
-NOTE: `sparse_vector` fields only support strictly positive values.
-Negative values will be rejected.
-
-NOTE: `sparse_vector` fields do not support <<analysis,analyzers>>, querying, sorting or aggregating.
-They may only be used within specialized queries.
-The recommended query to use on these fields are <<query-dsl-sparse-vector-query, `sparse_vector`>> queries.
-They may also be used within legacy <<query-dsl-text-expansion-query,`text_expansion`>> queries.
-
-NOTE: `sparse_vector` fields only preserve 9 significant bits for the precision, which translates to a relative error of about 0.4%.
+[[稀疏向量]][[index-multi-value-sparse-vectors]] ==== 多值稀疏向量
+传入稀疏向量的值数组时，选择类似命名特征的最大值。
+长文档的学习稀疏检索（https://arxiv.org/pdf/2305.18494.pdf）论文对此进行了更详细的讨论。总之，研究结果支持表示聚合通常优于分数聚合。
+对于希望使用重叠功能名称的实例，应单独存储它们或使用嵌套字段。
+下面是一个传入具有重叠特征名称的文档的示例。考虑到在这个示例中存在积极情绪和消极情绪两个类别。然而，为了检索的目的，我们也想要整体影响，而不是特定的情绪。在示例中，“影响”存储为多值稀疏矢量，并且只存储重叠名称的最大值。更具体地说，这里的最终“GET”查询返回约1.2的“_score”（这是“max（imp.美味[0]， imp.美味[1]）”，并且是近似值，因为我们有0.4%的相对误差，如下所述）
+[源，控制台]--------------------------------放置my-index-000001{"映射"：{"属性"：{"文本"：{"类型"："文本"，"分析器"："标准"}，"影响"：{"类型"："sparse_vector"}，"正"：{"类型"："sparse_vector"}，"负"：{"类型"："sparse_vector" } } } }
+POST my-index-000001/_doc{“文本”：“我吃了一些非常美味的胡萝卜。”，“影响”：[{“我”： 0.55，“有”：0.4，“一些”：0.28，“非常”：0.01，“美味”：1.2，“胡萝卜”：0.8}，{“我”：0.54，“有”：0.4，“一些”：0.28，“非常”：2.01，“美味”：0.02，“胡萝卜”：0.4}]，“积极”：{“我”：0.55，“有”：0.4，“一些”：0.28，“非常”：0.01，“美味”：1.2，“胡萝卜”：0.8}，“消极”：{“我”：0.54，“有”：0.4，“一些”：0.28，“非常”：2.01，“美味”：0.02，“胡萝卜”：0.4}}
+获取my-index-000001/_search{查询：{术语：{影响：{价值：美味" } } } } --------------------------------
+注意：“sparse_vector”字段不能包含在8.0到8.10之间{es}版本上*创建的索引中
+注意：“sparse_vector”字段仅支持严格的正值。负值将被拒绝。
+注意：“sparse_vector”字段不支持<<分析、分析器>>、查询、排序或聚合。它们只能在专门查询中使用。对这些字段使用的推荐查询是<<query-dsl-sparse-vector-query、'sparse_vector'>>查询。它们也可以在传统的<<query-dsl-text-expansion-query、'text_expansion'>>查询中使用。
+注意：“sparse_vector”字段仅为精度保留9个有效位，这意味着相对误差约为0.4%。
